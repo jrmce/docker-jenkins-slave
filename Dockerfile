@@ -1,4 +1,4 @@
-FROM node:6.9.5-slim
+FROM node:6.10
 
 RUN apt-get update && apt-get install -y \
     openssh-server \
@@ -30,7 +30,6 @@ ADD entrypoint.sh /entrypoint.sh
 RUN chmod +x /etc/init.d/xvfb \
     && chmod +x /entrypoint.sh
 
-ENV DISPLAY :99.0
 ENV CHROME_BIN /usr/bin/google-chrome
 
 RUN mkdir /home/jenkins/.ssh \
@@ -40,10 +39,11 @@ RUN mkdir /home/jenkins/.ssh \
     && mkdir /home/jenkins/.aws \
     && touch /home/jenkins/.aws/credentials \
     && echo "[default]" >> /home/jenkins/.aws/credentials \
-    && chown -R jenkins:jenkins /home/jenkins/.aws
+    && chown -R jenkins:jenkins /home/jenkins/.aws \
+    && echo "DISPLAY=:99" >> /etc/environment
 
 # Standard SSH port
 EXPOSE 22
 
-CMD ["/usr/sbin/sshd", "-D"]
 ENTRYPOINT ["/entrypoint.sh"]
+CMD ["/usr/sbin/sshd", "-D"]
